@@ -21,5 +21,12 @@ This project was created as a **machine test / technical assessment** to demonst
 - Angular Router
 - Angular HTTP Client
 
----
+## 🗄️ Database Models & Relationships
 
+The system has **three main models**:
+
+1. **Users** – stores all users (customers and admins)  
+2. **Personal Details** – stores additional info for each user (1-to-1 with Users)  
+3. **Applications** – stores loan applications submitted by users (1-to-many with Users) 
+
+---
