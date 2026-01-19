@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Application;
 
 class ApplicationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
+    public function index(Request $request) {
+        $query = Application::query();
+        return $query->with('user')->paginate(10);
     }
 
     /**
@@ -20,6 +21,12 @@ class ApplicationController extends Controller
     public function store(Request $request)
     {
         //
+        $data = $request->validate([
+            'users_id' => 'required|exists:users,id',
+            'status' => 'required|string',
+            'amount' => 'required|numeric',
+            // Add other fields and their validation rules as necessary
+        ]);
     }
 
     /**
