@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\UserPersonal;
+use App\Models\Application;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,11 +17,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create 5 users
+        User::factory(5)->create()->each(function($user) {
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+            // Create one personal info for each user
+            UserPersonal::factory()->create([
+                'users_id' => $user->id,
+            ]);
+
+            // Create 1-3 applications for each user
+            Application::factory(rand(1, 3))->create([
+                'users_id' => $user->id,
+            ]);
+        });
     }
 }
