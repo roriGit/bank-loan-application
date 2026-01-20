@@ -11,6 +11,18 @@ class UserPersonal extends Model
     protected $table = 'users_personal';
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'contact_number',
+        'employment_status',
+        'employment_type',
+        'date_of_birth',
+        'address',
+        'city',
+        'province',
+        'postal_code',
+        'country',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class, 'users_id');
