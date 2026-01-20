@@ -11,6 +11,16 @@ class Application extends Model
 {
 
     protected $table = 'applications';
+    protected $fillable = [
+        'users_id',
+        'loan_type',
+        'loan_amount',
+        'loan_term_months',
+        'monthly_income',
+        'status',
+        'notes',
+        'application_date',
+    ];
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
     use SoftDeletes;

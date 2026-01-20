@@ -14,6 +14,7 @@ class UserPersonal extends Model
     use HasFactory, Notifiable;
     use SoftDeletes;
     
+
     protected $fillable = [
         'contact_number',
         'employment_status',

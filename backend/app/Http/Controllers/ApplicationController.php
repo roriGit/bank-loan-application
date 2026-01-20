@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Application;
+use App\Http\Controllers\AuthController;
 
 class ApplicationController extends Controller
 {
@@ -20,21 +21,29 @@ class ApplicationController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $data = $request->validate([
+        $data_personal =$request->validate([
             'users_id' => 'required|exists:users,id',
-            'status' => 'required|string',
-            'amount' => 'required|numeric',
-            // Add other fields and their validation rules as necessary
+            'loan_type' => 'nullable|string|in:personal,home,auto',
+            'loan_amount' => 'required|numeric|min:0', 
+            'loan_term_months' => 'required|integer|min:1',
+            'monthly_income' => 'nullable|numeric|min:0',
+            'status' => 'required|string|in:pending,approved,rejected',
+            'notes' => 'nullable|string', 
+            'application_date' => 'nullable|date',
         ]);
+        $application = Application::create($data_personal);
+        return response()->json($application, 201);
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
-        //
+        $id = $request->user_id;
+        $application = Application::with('user')->findOrFail($id);
+        return response()->json($application);
     }
 
     /**
