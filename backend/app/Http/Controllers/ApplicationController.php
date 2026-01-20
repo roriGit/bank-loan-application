@@ -39,9 +39,11 @@ class ApplicationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
-        //
+        $id = $request->user_id;
+        $application = Application::with('user')->findOrFail($id);
+        return response()->json($application);
     }
 
     /**
