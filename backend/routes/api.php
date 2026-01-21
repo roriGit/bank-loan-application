@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\UserPersonalController;
+use App\Http\Controllers\AdminApplicationController;
 
 Route::get('/user', function (Request $request) {
     return User::first(); // just return first user for testing
@@ -33,3 +34,13 @@ Route::apiResource('applications', ApplicationController::class);
 Route::apiResource('applications', ApplicationController::class);
 Route::get('users/{user}/applications', [ApplicationController::class, 'applicationsByUser']);
 
+// Protected routes for the admin
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin/applications', [AdminApplicationController::class, 'applications']);
+    Route::get('/admin/user/{user}/applications', [AdminApplicationController::class, 'applicationsByUser']);
+    Route::put('/admin/applications/{application}', [AdminApplicationController::class, 'editApplication']);
+
+    Route::get('/admin/users', [AdminApplicationController::class, 'usersWithApplications']);
+    Route::get('/admin/user/{user}', [AdminApplicationController::class, 'userWithApplications']);
+    Route::put('/admin/user/{user}', [AdminApplicationController::class, 'editUser']);
+});

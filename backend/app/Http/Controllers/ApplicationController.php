@@ -51,7 +51,18 @@ class ApplicationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $application = Application::findOrFail($id);
+        $data_personal = $request->validate([
+            'loan_type' => 'nullable|string|in:personal,home,auto',
+            'loan_amount' => 'required|numeric|min:0',
+            'loan_term_months' => 'required|integer|min:1',
+            'monthly_income' => 'nullable|numeric|min:0',
+            'status' => 'required|string|in:pending,approved,rejected',
+            'notes' => 'nullable|string',
+            'application_date' => 'nullable|date',
+        ]);
+        $application->update($data_personal);
+        return response()->json($application);
     }
 
     /**
