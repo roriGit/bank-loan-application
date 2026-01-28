@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Application;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 
 class ApplicationController extends Controller
@@ -51,16 +52,25 @@ class ApplicationController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        dd(Auth::user()->role);
+        if(Auth::user()->id!=$id && Auth::user()->role!='admin'){
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
         $application = Application::findOrFail($id);
         $data_personal = $request->validate([
-            'loan_type' => 'nullable|string|in:personal,home,auto',
-            'loan_amount' => 'required|numeric|min:0',
-            'loan_term_months' => 'required|integer|min:1',
-            'monthly_income' => 'nullable|numeric|min:0',
-            'status' => 'required|string|in:pending,approved,rejected',
-            'notes' => 'nullable|string',
-            'application_date' => 'nullable|date',
+            'loan_type' => 'sometimes|string|in:personal,home,auto',
+            'loan_amount' => 'sometimes|numeric|min:0',
+            'loan_term_months' => 'sometimes|integer|min:1',
+            'monthly_income' => 'sometimes|numeric|min:0',
+            'notes' => 'sometimes|string',
         ]);
+        if (Auth::user()->role === 'admin') {
+            $request->validate([
+                'application_date' => 'sometimes|date',
+                'status' => 'required|string|in:pending,approved,rejected',
+            ]);
+            $data_personal['status'] = $request->status;
+        }
         $application->update($data_personal);
         return response()->json($application);
     }
@@ -71,5 +81,15 @@ class ApplicationController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+    
+    public function applicationsByUser(Request $request, String $user)
+    {
+        $application = Application::with([
+            'user',
+            'user.personalInfo'
+        ])->where('users_id', $user)->paginate(10);
+        
+        return response()->json($application);
     }
 }

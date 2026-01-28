@@ -32,6 +32,14 @@ class UserController extends Controller
         //
         return response()->json(data: User::findOrFail($id));
     }
+    /*
+    * Get a single user with their applications
+    */
+    public function userWithApplications(Request $request, $userId)
+    {
+        $user = User::with('applications', 'personalInfo')->findOrFail($userId);
+        return response()->json($user);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -61,7 +69,7 @@ class UserController extends Controller
         $userPersonalUpdated = $user->personalInfo()->updateOrCreate(
             [],                        // no extra lookup needed, Laravel knows users_id
             $user_personal_data ?? []  // update/create fields
-        );
+        )->exists;
         $userUpdated = $user->update($user_data);
 
         // Return response on whether any update occurred on the user or personal info
@@ -88,5 +96,23 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * List users with their applications
+     */
+    public function usersRegistered(Request $request)
+    {
+        $users = User::with('personalInfo','applications')->get();
+        return response()->json($users);
+    }
+
+    /**
+     * List users who have applications only
+     */
+    public function usersWithApplications(Request $request)
+    {
+        $users = User::with(relations: 'personalInfo')->whereHas('applications')->paginate(10);
+        return response()->json($users);
     }
 }
