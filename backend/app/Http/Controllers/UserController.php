@@ -57,10 +57,12 @@ class UserController extends Controller
         ]);
         
         $user = User::findOrFail($id);
-        $user_personal = UserPersonal::where('users_id', $id)->first();
         
+        $userPersonalUpdated = $user->personalInfo()->updateOrCreate(
+            [],                        // no extra lookup needed, Laravel knows users_id
+            $user_personal_data ?? []  // update/create fields
+        );
         $userUpdated = $user->update($user_data);
-        $userPersonalUpdated = $user_personal->update($user_personal_data);
 
         // Return response on whether any update occurred on the user or personal info
         return response()->json([
@@ -70,7 +72,7 @@ class UserController extends Controller
                 : 'No changes were made to the user or personal info.',
             'data' => [
                 'user' => $user,
-                'user_personal' => $user_personal
+                'user_personal' => $userPersonalUpdated
             ],
             'updated' => [
                 'user' => $userUpdated,
