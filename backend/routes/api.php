@@ -6,8 +6,6 @@ use App\Models\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\UserPersonalController;
-use App\Http\Controllers\AdminApplicationController;
 
 Route::get('/user', function (Request $request) {
     return User::first(); // just return first user for testing
@@ -15,32 +13,31 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+// Protected routes for the admin
 
-Route::middleware('auth:sanctum')->get('/me', [AuthController::class, 'me']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-// Users CRUD routes
-Route::apiResource('users', UserController::class);
+Route::middleware('auth:sanctum')->group(function () {
 
 
-// Personal Info (nested under user)
-Route::get('users/{user}/personal-info', [UserPersonalController::class, 'show']);
-Route::post('users/{user}/personal-info', [UserPersonalController::class, 'store']);
-Route::put('users/{user}/personal-info', [UserPersonalController::class, 'update']);
+
+
 
 // Users CRUD routes
 Route::apiResource('applications', ApplicationController::class);
+
 
 // Applications
-Route::apiResource('applications', ApplicationController::class);
-Route::get('users/{user}/applications', [ApplicationController::class, 'applicationsByUser']);
+    Route::apiResource('applications', ApplicationController::class);
+    Route::get('/applications', [ApplicationController::class, 'index']);
+    Route::put('/applications/{application}', [ApplicationController::class, 'update']);
 
-// Protected routes for the admin
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/admin/applications', [AdminApplicationController::class, 'applications']);
-    Route::get('/admin/user/{user}/applications', [AdminApplicationController::class, 'applicationsByUser']);
-    Route::put('/admin/applications/{application}', [AdminApplicationController::class, 'editApplication']);
-
-    Route::get('/admin/users', [AdminApplicationController::class, 'usersWithApplications']);
-    Route::get('/admin/user/{user}', [AdminApplicationController::class, 'userWithApplications']);
-    Route::put('/admin/user/{user}', [AdminApplicationController::class, 'editUser']);
+    // Users CRUD routes
+    Route::apiResource('users', UserController::class);
+    // Personal Info (nested under user)
+    Route::get('/users', [UserController::class, 'usersRegistered']);
+    Route::get('/user/{user}', action: [ApplicationController::class, 'userWithApplications']);
+    Route::post('/users/{user}', [UserController::class, 'store']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::get('/me', [AuthController::class, 'profile']);
 });

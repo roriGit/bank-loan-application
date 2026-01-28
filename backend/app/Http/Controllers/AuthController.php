@@ -64,12 +64,24 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function me(Request $request)
+    public function profile(Request $request)
     {
         // Return the authenticated user with personal info and applications
-        $user = $request->user()->load('personalInfo', 'applications');
+        $user = $request->user()->load('personalInfo');
 
         return response()->json($user);
     }
 
+    /**
+     * Log the user out and revoke their token.
+     */
+    public function logout(Request $request)
+    {
+
+        $request->user()->currentAccessToken()->delete(); // Revoke the current token
+       
+        return response()->json([
+            'message' => 'Successfully logged out'
+        ], 200);
+    }
 }
